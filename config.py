@@ -38,6 +38,17 @@ class Config:
             self.imap_pass = os.getenv("IMAP_PASS", "").strip()
             self.imap_dir = os.getenv("IMAP_DIR", "inbox").strip()
 
+        # Read domains from DOMAIN variable (supports single or comma-separated)
+        domain_str = os.getenv("DOMAIN", "").strip()
+        self.domains = []
+        if domain_str:
+            if ',' in domain_str:
+                # Multiple domains provided
+                self.domains = [d.strip() for d in domain_str.split(',') if d.strip()]
+            else:
+                # Single domain provided
+                self.domains = [domain_str]
+
         self.check_config()
 
     def get_temp_mail(self):
@@ -63,8 +74,9 @@ class Config:
             "imap_dir": self.imap_dir,
         }
 
-    def get_domain(self):
-        return self.domain
+    def get_domains(self):
+        """获取配置的域名列表"""
+        return self.domains
 
     def get_protocol(self):
         """获取邮件协议类型
@@ -78,19 +90,14 @@ class Config:
         """检查配置项是否有效
 
         检查规则：
-        1. 如果使用 tempmail.plus，需要配置 TEMP_MAIL 和 DOMAIN
-        2. 如果使用 IMAP，需要配置 IMAP_SERVER、IMAP_PORT、IMAP_USER、IMAP_PASS
-        3. IMAP_DIR 是可选的
+        1. 需要配置 DOMAIN (单个或逗号分隔的多个域名)
+        2. 如果使用 tempmail.plus，需要配置 TEMP_MAIL
+        3. 如果使用 IMAP，需要配置 IMAP_SERVER、IMAP_PORT、IMAP_USER、IMAP_PASS
+        4. IMAP_DIR 是可选的
         """
-        # 基础配置检查
-        required_configs = {
-            "domain": "域名",
-        }
-
-        # 检查基础配置
-        for key, name in required_configs.items():
-            if not self.check_is_valid(getattr(self, key)):
-                raise ValueError(f"{name}未配置，请在 .env 文件中设置 {key.upper()}")
+        # 基础配置检查 (域名)
+        if not self.domains:
+             raise ValueError("域名未配置，请在 .env 文件中设置 DOMAIN (可配置单个或逗号分隔的多个域名)")
 
         # 检查邮箱配置
         if self.temp_mail != "null":
@@ -141,7 +148,8 @@ class Config:
             logging.info(
                 f"\033[32m临时邮箱: {self.temp_mail}{self.temp_mail_ext}\033[0m"
             )
-        logging.info(f"\033[32m域名: {self.domain}\033[0m")
+        # Print domains
+        logging.info(f"\033[32m域名列表: {', '.join(self.domains)}\033[0m")
 
 
 # 使用示例

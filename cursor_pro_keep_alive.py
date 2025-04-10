@@ -340,7 +340,10 @@ class EmailGenerator:
     ):
         configInstance = Config()
         configInstance.print_config()
-        self.domain = configInstance.get_domain()
+        # Get the list of domains
+        self.domains = configInstance.get_domains()
+        if not self.domains:
+            raise ValueError("No domains configured in .env file. Please set DOMAINS or DOMAIN.")
         self.names = self.load_names()
         self.default_password = password
         self.default_first_name = self.generate_random_name()
@@ -365,7 +368,9 @@ class EmailGenerator:
         """生成随机邮箱地址"""
         length = random.randint(0, length)  # 生成0到length之间的随机整数
         timestamp = str(int(time.time()))[-length:]  # 使用时间戳后length位
-        return f"{self.default_first_name}{timestamp}@{self.domain}"  #
+        # Randomly choose a domain from the list
+        chosen_domain = random.choice(self.domains)
+        return f"{self.default_first_name}{timestamp}@{chosen_domain}"  #
 
     def get_account_info(self):
         """获取完整的账号信息"""
