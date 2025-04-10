@@ -120,6 +120,9 @@ jobs:
     needs: [build-windows, build-macos-arm64, build-linux, build-macos-intel]
     runs-on: ubuntu-22.04
     if: startsWith(github.ref, 'refs/tags/')
+    # Add permissions for the GITHUB_TOKEN to create releases
+    permissions:
+      contents: write
     
     steps:
       - name: Download all artifacts
@@ -146,4 +149,5 @@ jobs:
             artifacts/CursorPro-MacOS-Intel.zip
 
         env:
-          GITHUB_TOKEN: ${{ secrets.TOKEN }}
+          # Use the automatically provided GITHUB_TOKEN
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
