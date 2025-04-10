@@ -2,8 +2,7 @@
 build/
 dist/
 *.spec
-!CursorKeepAlive.mac.spec
-!CursorKeepAlive.win.spec
+!CursorKeepAlive.spec
 
 # Python
 __pycache__/
