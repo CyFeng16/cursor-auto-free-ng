@@ -12,12 +12,16 @@ jobs:
   remove-old-artifacts:
     runs-on: ubuntu-latest
     timeout-minutes: 10
+    # Add permissions for the GITHUB_TOKEN to delete artifacts
+    permissions:
+      actions: write
 
     steps:
     - name: Remove old artifacts
       uses: c-hive/gha-remove-artifacts@v1
       with:
-        GITHUB_TOKEN: ${{ secrets.TOKEN }}
+        # Use the automatically provided GITHUB_TOKEN
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         age: '5 days' # '<number> <unit>', e.g. 5 days, 2 years, 90 seconds, parsed by Moment.js
         # Optional inputs
         # skip-tags: true
